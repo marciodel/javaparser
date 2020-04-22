@@ -26,6 +26,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.resolution.MethodUsage;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -176,5 +177,10 @@ public class JavaParserMethodDeclaration implements ResolvedMethodDeclaration, T
     @Override
     public Optional<MethodDeclaration> toAst() {
         return Optional.of(wrappedNode);
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return AstResolutionUtils.getAnnotations(wrappedNode, typeSolver);
     }
 }

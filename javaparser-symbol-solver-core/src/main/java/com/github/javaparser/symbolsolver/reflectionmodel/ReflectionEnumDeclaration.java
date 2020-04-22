@@ -23,6 +23,7 @@ package com.github.javaparser.symbolsolver.reflectionmodel;
 
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.resolution.MethodUsage;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -158,6 +159,11 @@ public class ReflectionEnumDeclaration extends AbstractTypeDeclaration
   }
 
   @Override
+  public List<ResolvedAnnotationExpression> getAnnotations() {
+      return reflectionClassAdapter.getAnnotations();
+  }
+
+@Override
   public String getName() {
     return clazz.getSimpleName();
   }

@@ -27,6 +27,7 @@ Bundle-SymbolicName: com.github.javaparser.javaparser-core
     com.github.javaparser.printer.lexicalpreservation, \
     com.github.javaparser.printer.lexicalpreservation.changes, \
     com.github.javaparser.resolution, \
+    com.github.javaparser.resolution.annotations, \
     com.github.javaparser.resolution.declarations, \
     com.github.javaparser.resolution.types, \
     com.github.javaparser.resolution.types.parametrization, \

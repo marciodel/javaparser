@@ -23,6 +23,7 @@ package com.github.javaparser.symbolsolver.reflectionmodel;
 
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.resolution.MethodUsage;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -131,6 +132,11 @@ public class ReflectionAnnotationDeclaration extends AbstractTypeDeclaration imp
     @Override
     public boolean hasDirectlyAnnotation(String canonicalName) {
         return reflectionClassAdapter.hasDirectlyAnnotation(canonicalName);
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations() {
+        return reflectionClassAdapter.getAnnotations();
     }
 
     @Override

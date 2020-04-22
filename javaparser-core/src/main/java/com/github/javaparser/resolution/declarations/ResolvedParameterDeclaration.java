@@ -21,12 +21,14 @@
 
 package com.github.javaparser.resolution.declarations;
 
+import com.github.javaparser.resolution.annotations.HasAnnotations;
+
 /**
  * Declaration of a parameter.
  *
  * @author Federico Tomassetti
  */
-public interface ResolvedParameterDeclaration extends ResolvedValueDeclaration {
+public interface ResolvedParameterDeclaration extends ResolvedValueDeclaration, HasAnnotations {
 
     @Override
     default boolean isParameter() {

@@ -24,6 +24,7 @@ package com.github.javaparser.symbolsolver.javassistmodel;
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
@@ -36,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Fred Lefévère-Laoide
@@ -99,14 +101,21 @@ public class JavassistConstructorDeclaration implements ResolvedConstructorDecla
                 variadic = i == (ctConstructor.getParameterTypes().length - 1);
             }
             Optional<String> paramName = JavassistUtils.extractParameterName(ctConstructor, i);
+
+            MethodInfo mi = ctConstructor.getMethodInfo2();
+            ParameterAnnotationsAttribute ainfo = (ParameterAnnotationsAttribute)
+                        mi.getAttribute(ParameterAnnotationsAttribute.invisibleTag);  
+            ParameterAnnotationsAttribute ainfo2 = (ParameterAnnotationsAttribute)
+                        mi.getAttribute(ParameterAnnotationsAttribute.visibleTag);  
+
             if (ctConstructor.getGenericSignature() != null) {
                 SignatureAttribute.MethodSignature methodSignature = SignatureAttribute.toMethodSignature(ctConstructor.getGenericSignature());
                 SignatureAttribute.Type signatureType = methodSignature.getParameterTypes()[i];
                 return new JavassistParameterDeclaration(JavassistUtils.signatureTypeToType(signatureType,
-                        typeSolver, this), typeSolver, variadic, paramName.orElse(null));
+                        typeSolver, this), typeSolver, variadic, paramName.orElse(null), ainfo.getAnnotations()[i], ainfo2.getAnnotations()[i]);
             } else {
                 return new JavassistParameterDeclaration(ctConstructor.getParameterTypes()[i], typeSolver, variadic,
-                        paramName.orElse(null));
+                        paramName.orElse(null), ainfo.getAnnotations()[i], ainfo2.getAnnotations()[i]);
             }
         } catch (NotFoundException e) {
             throw new RuntimeException(e);
@@ -159,4 +168,17 @@ public class JavassistConstructorDeclaration implements ResolvedConstructorDecla
     public Optional<ConstructorDeclaration> toAst() {
         return Optional.empty();
     }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations() {
+        MethodInfo mi = ctConstructor.getMethodInfo2();
+        AnnotationsAttribute ainfo = (AnnotationsAttribute)
+                    mi.getAttribute(AnnotationsAttribute.invisibleTag);  
+        AnnotationsAttribute ainfo2 = (AnnotationsAttribute)
+                    mi.getAttribute(AnnotationsAttribute.visibleTag);  
+
+        return Stream.concat(Arrays.stream(ainfo.getAnnotations()), Arrays.stream(ainfo2.getAnnotations()))
+                    .map(ann -> new JavassistAnnotationExpression(ann, typeSolver))
+                    .collect(Collectors.toList());
+      }
 }

@@ -21,11 +21,19 @@
 
 package com.github.javaparser.symbolsolver.javassistmodel;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationMemberDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import javassist.CtMethod;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.MethodInfo;
 
 /**
  * @author Malte Skoruppa
@@ -58,4 +66,17 @@ public class JavassistAnnotationMemberDeclaration implements ResolvedAnnotationM
     public String getName() {
         return annotationMember.getName();
     }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations() {
+        MethodInfo mi = annotationMember.getMethodInfo2();
+        AnnotationsAttribute ainfo = (AnnotationsAttribute)
+                    mi.getAttribute(AnnotationsAttribute.invisibleTag);  
+        AnnotationsAttribute ainfo2 = (AnnotationsAttribute)
+                    mi.getAttribute(AnnotationsAttribute.visibleTag);  
+
+        return Stream.concat(Arrays.stream(ainfo.getAnnotations()), Arrays.stream(ainfo2.getAnnotations()))
+                    .map(ann -> new JavassistAnnotationExpression(ann, typeSolver))
+                    .collect(Collectors.toList());
+      }
 }

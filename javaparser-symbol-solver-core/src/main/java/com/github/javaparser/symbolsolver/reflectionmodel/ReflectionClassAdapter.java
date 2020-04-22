@@ -22,6 +22,7 @@
 package com.github.javaparser.symbolsolver.reflectionmodel;
 
 import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -46,11 +47,13 @@ class ReflectionClassAdapter {
     private Class<?> clazz;
     private TypeSolver typeSolver;
     private ResolvedReferenceTypeDeclaration typeDeclaration;
+    private ReflectionAnnotatedElementAdapter reflectionAnnotatedElementAdapter;
 
     public ReflectionClassAdapter(Class<?> clazz, TypeSolver typeSolver, ResolvedReferenceTypeDeclaration typeDeclaration) {
         this.clazz = clazz;
         this.typeSolver = typeSolver;
         this.typeDeclaration = typeDeclaration;
+        this.reflectionAnnotatedElementAdapter = new ReflectionAnnotatedElementAdapter(clazz, typeSolver);
     }
 
     public ReferenceTypeImpl getSuperClass() {
@@ -190,6 +193,10 @@ class ReflectionClassAdapter {
             }
         }
         return false;
+    }
+
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return reflectionAnnotatedElementAdapter.getAnnotations();
     }
 
     private final boolean isFunctionalInterface() {

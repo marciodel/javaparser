@@ -23,6 +23,7 @@ package com.github.javaparser.symbolsolver.javaparsermodel.declarations;
 
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.type.UnknownType;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -32,6 +33,7 @@ import com.github.javaparser.symbolsolver.javaparsermodel.contexts.LambdaExprCon
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.model.resolution.Value;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -101,5 +103,9 @@ public class JavaParserParameterDeclaration implements ResolvedParameterDeclarat
         return wrappedNode;
     }
 
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return AstResolutionUtils.getAnnotations(wrappedNode, typeSolver);
+    }
 
 }

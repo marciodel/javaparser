@@ -27,12 +27,20 @@ import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParametrizable;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
+
 import javassist.CtField;
 import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.BadBytecode;
+import javassist.bytecode.FieldInfo;
 import javassist.bytecode.SignatureAttribute;
 
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Federico Tomassetti
@@ -94,4 +102,17 @@ public class JavassistFieldDeclaration implements ResolvedFieldDeclaration {
     public ResolvedTypeDeclaration declaringType() {
         return JavassistFactory.toTypeDeclaration(ctField.getDeclaringClass(), typeSolver);
     }
+    
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations() {
+        FieldInfo fi = ctField.getFieldInfo2();
+        AnnotationsAttribute ainfo = (AnnotationsAttribute)
+                    fi.getAttribute(AnnotationsAttribute.invisibleTag);  
+        AnnotationsAttribute ainfo2 = (AnnotationsAttribute)
+                    fi.getAttribute(AnnotationsAttribute.visibleTag);  
+
+        return Stream.concat(Arrays.stream(ainfo.getAnnotations()), Arrays.stream(ainfo2.getAnnotations()))
+                    .map(ann -> new JavassistAnnotationExpression(ann, typeSolver))
+                    .collect(Collectors.toList());
+      }
 }

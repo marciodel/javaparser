@@ -21,8 +21,14 @@
 
 package com.github.javaparser.symbolsolver.javaparsermodel.declarations;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationMemberDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.core.resolution.Context;
@@ -64,5 +70,10 @@ public class JavaParserAnnotationMemberDeclaration implements ResolvedAnnotation
 
     private Context getContext() {
         return JavaParserFactory.getContext(wrappedNode, typeSolver);
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return AstResolutionUtils.getAnnotations(wrappedNode, typeSolver);
     }
 }

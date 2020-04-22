@@ -21,6 +21,7 @@
 
 package com.github.javaparser.resolution.declarations;
 
+import com.github.javaparser.resolution.annotations.HasAnnotations;
 import com.github.javaparser.resolution.types.ResolvedType;
 
 import java.util.Collections;
@@ -34,7 +35,7 @@ import java.util.Optional;
  * @author Federico Tomassetti
  */
 public interface ResolvedMethodLikeDeclaration extends ResolvedDeclaration,
-        ResolvedTypeParametrizable, HasAccessSpecifier {
+        ResolvedTypeParametrizable, HasAccessSpecifier, HasAnnotations {
     /**
      * The package name of the declaring type.
      */

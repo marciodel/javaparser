@@ -22,12 +22,15 @@
 package com.github.javaparser.symbolsolver.javaparsermodel.declarations;
 
 import com.github.javaparser.ast.body.EnumDeclaration;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedEnumConstantDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
 
 import static com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode;
+
+import java.util.List;
 
 /**
  * @author Federico Tomassetti
@@ -61,4 +64,8 @@ public class JavaParserEnumConstantDeclaration implements ResolvedEnumConstantDe
         return wrappedNode;
     }
 
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return AstResolutionUtils.getAnnotations(wrappedNode, typeSolver);
+    }
 }

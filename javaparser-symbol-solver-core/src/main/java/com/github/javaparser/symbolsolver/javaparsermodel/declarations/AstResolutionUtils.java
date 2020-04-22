@@ -32,10 +32,12 @@ import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclarat
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFactory;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.google.common.collect.ImmutableList;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -110,6 +112,12 @@ class AstResolutionUtils {
             }
         }
         return false;
+    }
+
+    static List<ResolvedAnnotationExpression> getAnnotations(NodeWithAnnotations<?> nodeWithAnnotations, TypeSolver typeSolver){
+        return nodeWithAnnotations.getAnnotations().stream()
+                .map(ann->new JavaParserAnnotationExpression(ann, typeSolver))
+                .collect(Collectors.toList());
     }
 
     static <N extends ResolvedReferenceTypeDeclaration> List<ResolvedConstructorDeclaration> getConstructors(

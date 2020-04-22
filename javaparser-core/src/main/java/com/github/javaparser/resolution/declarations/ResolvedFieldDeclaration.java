@@ -21,12 +21,14 @@
 
 package com.github.javaparser.resolution.declarations;
 
+import com.github.javaparser.resolution.annotations.HasAnnotations;
+
 /**
  * Declaration of a field.
  *
  * @author Federico Tomassetti
  */
-public interface ResolvedFieldDeclaration extends ResolvedValueDeclaration, HasAccessSpecifier {
+public interface ResolvedFieldDeclaration extends ResolvedValueDeclaration, HasAccessSpecifier, HasAnnotations {
 
     /**
      * Is the field static?

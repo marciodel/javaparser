@@ -25,12 +25,14 @@ import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.github.javaparser.symbolsolver.javaparser.Navigator.demandParentNode;
@@ -107,4 +109,10 @@ public class JavaParserFieldDeclaration implements ResolvedFieldDeclaration {
         }
         throw new IllegalStateException();
     }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return AstResolutionUtils.getAnnotations(wrappedNode, typeSolver);
+    }
+
 }

@@ -22,6 +22,7 @@
 package com.github.javaparser.symbolsolver.reflectionmodel;
 
 import com.github.javaparser.ast.AccessSpecifier;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -29,6 +30,7 @@ import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 /**
  * @author Federico Tomassetti
@@ -38,11 +40,13 @@ public class ReflectionFieldDeclaration implements ResolvedFieldDeclaration {
     private Field field;
     private TypeSolver typeSolver;
     private ResolvedType type;
+    private ReflectionAnnotatedElementAdapter reflectionAnnotatedElementAdapter;
 
     public ReflectionFieldDeclaration(Field field, TypeSolver typeSolver) {
         this.field = field;
         this.typeSolver = typeSolver;
         this.type = calcType();
+        this.reflectionAnnotatedElementAdapter = new ReflectionAnnotatedElementAdapter(field, typeSolver);
     }
 
     private ReflectionFieldDeclaration(Field field, TypeSolver typeSolver, ResolvedType type) {
@@ -98,5 +102,10 @@ public class ReflectionFieldDeclaration implements ResolvedFieldDeclaration {
     @Override
     public AccessSpecifier accessSpecifier() {
         return ReflectionFactory.modifiersToAccessLevel(field.getModifiers());
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return reflectionAnnotatedElementAdapter.getAnnotations();
     }
 }
