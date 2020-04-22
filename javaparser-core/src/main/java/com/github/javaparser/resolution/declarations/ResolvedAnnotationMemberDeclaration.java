@@ -22,11 +22,12 @@
 package com.github.javaparser.resolution.declarations;
 
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.resolution.annotations.HasAnnotations;
 
 /**
  * @author Federico Tomassetti
  */
-public interface ResolvedAnnotationMemberDeclaration extends ResolvedValueDeclaration {
+public interface ResolvedAnnotationMemberDeclaration extends ResolvedValueDeclaration, HasAnnotations {
 
     Expression getDefaultValue();
 }

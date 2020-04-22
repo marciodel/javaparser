@@ -21,16 +21,20 @@
 
 package com.github.javaparser.symbolsolver.javassistmodel;
 
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import javassist.CtClass;
 import javassist.NotFoundException;
 import javassist.bytecode.AccessFlag;
+import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.BadBytecode;
+import javassist.bytecode.ClassFile;
 import javassist.bytecode.SignatureAttribute;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Federico Tomassetti
@@ -100,5 +104,17 @@ public class JavassistTypeDeclarationAdapter {
     } catch (NotFoundException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public List<ResolvedAnnotationExpression> getAnnotations(){
+    ClassFile cf = ctClass.getClassFile2();
+    AnnotationsAttribute ainfo = (AnnotationsAttribute)
+            cf.getAttribute(AnnotationsAttribute.invisibleTag);  
+    AnnotationsAttribute ainfo2 = (AnnotationsAttribute)
+            cf.getAttribute(AnnotationsAttribute.visibleTag);  
+
+    return Stream.concat(Arrays.stream(ainfo.getAnnotations()), Arrays.stream(ainfo2.getAnnotations()))
+                  .map(ann -> new JavassistAnnotationExpression(ann, typeSolver))
+                  .collect(Collectors.toList());
   }
 }

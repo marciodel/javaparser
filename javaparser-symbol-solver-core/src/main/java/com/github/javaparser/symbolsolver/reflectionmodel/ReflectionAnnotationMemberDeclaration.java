@@ -22,11 +22,13 @@
 package com.github.javaparser.symbolsolver.reflectionmodel;
 
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationMemberDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author Malte Skoruppa
@@ -35,10 +37,12 @@ public class ReflectionAnnotationMemberDeclaration implements ResolvedAnnotation
 
     private Method annotationMember;
     private TypeSolver typeSolver;
+    private ReflectionAnnotatedElementAdapter reflectionAnnotatedElementAdapter;
 
     public ReflectionAnnotationMemberDeclaration(Method annotationMember, TypeSolver typeSolver) {
         this.annotationMember = annotationMember;
         this.typeSolver = typeSolver;
+        this.reflectionAnnotatedElementAdapter = new ReflectionAnnotatedElementAdapter(annotationMember, typeSolver);
     }
 
     @Override
@@ -57,5 +61,10 @@ public class ReflectionAnnotationMemberDeclaration implements ResolvedAnnotation
     @Override
     public String getName() {
         return annotationMember.getName();
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations() {
+        return reflectionAnnotatedElementAdapter.getAnnotations();
     }
 }

@@ -21,10 +21,18 @@
 
 package com.github.javaparser.symbolsolver.javassistmodel;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
+
 import javassist.CtClass;
+import javassist.bytecode.annotation.Annotation;
 
 /**
  * @author Federico Tomassetti
@@ -34,16 +42,23 @@ public class JavassistParameterDeclaration implements ResolvedParameterDeclarati
     private TypeSolver typeSolver;
     private boolean variadic;
     private String name;
+    private Annotation[] invisibleAnnotations;
+    private Annotation[] visibleAnnotations;
 
-    public JavassistParameterDeclaration(CtClass type, TypeSolver typeSolver, boolean variadic, String name) {
-        this(JavassistFactory.typeUsageFor(type, typeSolver), typeSolver, variadic, name);
+    public JavassistParameterDeclaration(CtClass type, TypeSolver typeSolver, boolean variadic, String name,
+            Annotation[] invisibleAnnotations, Annotation[] visibleAnnotations) {
+        this(JavassistFactory.typeUsageFor(type, typeSolver), typeSolver, variadic, name, invisibleAnnotations,
+                visibleAnnotations);
     }
 
-    public JavassistParameterDeclaration(ResolvedType type, TypeSolver typeSolver, boolean variadic, String name) {
+    public JavassistParameterDeclaration(ResolvedType type, TypeSolver typeSolver, boolean variadic, String name,
+            Annotation[] invisibleAnnotations, Annotation[] visibleAnnotations) {
         this.name = name;
         this.type = type;
         this.typeSolver = typeSolver;
         this.variadic = variadic;
+        this.invisibleAnnotations = invisibleAnnotations;
+        this.visibleAnnotations = visibleAnnotations;
     }
 
     @Override
@@ -89,4 +104,11 @@ public class JavassistParameterDeclaration implements ResolvedParameterDeclarati
     public ResolvedType getType() {
         return type;
     }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations() {
+        return Stream.concat(Arrays.stream(invisibleAnnotations), Arrays.stream(visibleAnnotations))
+                    .map(ann -> new JavassistAnnotationExpression(ann, typeSolver))
+                    .collect(Collectors.toList());
+      }
 }

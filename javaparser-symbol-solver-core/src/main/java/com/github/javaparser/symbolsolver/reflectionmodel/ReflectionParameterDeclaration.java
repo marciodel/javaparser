@@ -21,10 +21,14 @@
 
 package com.github.javaparser.symbolsolver.reflectionmodel;
 
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Parameter;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -36,6 +40,7 @@ public class ReflectionParameterDeclaration implements ResolvedParameterDeclarat
     private TypeSolver typeSolver;
     private boolean variadic;
     private String name;
+    private ReflectionAnnotatedElementAdapter reflectionAnnotatedElementAdapter;
 
     /**
      *
@@ -43,15 +48,16 @@ public class ReflectionParameterDeclaration implements ResolvedParameterDeclarat
      * @param genericType
      * @param typeSolver
      * @param variadic
-     * @param name can potentially be null
+     * @param parameter
      */
     public ReflectionParameterDeclaration(Class<?> type, java.lang.reflect.Type genericType, TypeSolver typeSolver,
-                                          boolean variadic, String name) {
+            boolean variadic, Parameter parameter) {
         this.type = type;
         this.genericType = genericType;
         this.typeSolver = typeSolver;
         this.variadic = variadic;
-        this.name = name;
+        this.name = parameter.getName();
+        this.reflectionAnnotatedElementAdapter = new ReflectionAnnotatedElementAdapter(parameter, typeSolver);
     }
 
     /**
@@ -116,5 +122,10 @@ public class ReflectionParameterDeclaration implements ResolvedParameterDeclarat
     @Override
     public int hashCode() {
         return Objects.hash(type, genericType, typeSolver, variadic, name);
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return reflectionAnnotatedElementAdapter.getAnnotations();
     }
 }

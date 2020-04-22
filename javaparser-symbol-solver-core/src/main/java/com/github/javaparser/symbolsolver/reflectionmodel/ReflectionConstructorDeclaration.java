@@ -23,6 +23,7 @@ package com.github.javaparser.symbolsolver.reflectionmodel;
 
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
@@ -43,10 +44,12 @@ public class ReflectionConstructorDeclaration implements ResolvedConstructorDecl
 
     private Constructor<?> constructor;
     private TypeSolver typeSolver;
+    private ReflectionAnnotatedElementAdapter reflectionAnnotatedElementAdapter;
 
     public ReflectionConstructorDeclaration(Constructor<?> constructor, TypeSolver typeSolver) {
         this.constructor = constructor;
         this.typeSolver = typeSolver;
+        this.reflectionAnnotatedElementAdapter = new ReflectionAnnotatedElementAdapter(constructor, typeSolver);
     }
 
     @Override
@@ -70,7 +73,7 @@ public class ReflectionConstructorDeclaration implements ResolvedConstructorDecl
         }
         return new ReflectionParameterDeclaration(constructor.getParameterTypes()[i],
                 constructor.getGenericParameterTypes()[i], typeSolver, variadic,
-                constructor.getParameters()[i].getName());
+                constructor.getParameters()[i]);
     }
 
     @Override
@@ -104,5 +107,10 @@ public class ReflectionConstructorDeclaration implements ResolvedConstructorDecl
     @Override
     public Optional<ConstructorDeclaration> toAst() {
         return Optional.empty();
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return reflectionAnnotatedElementAdapter.getAnnotations();
     }
 }

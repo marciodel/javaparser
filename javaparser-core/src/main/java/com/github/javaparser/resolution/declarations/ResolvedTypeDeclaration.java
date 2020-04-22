@@ -22,6 +22,7 @@
 package com.github.javaparser.resolution.declarations;
 
 import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.annotations.HasAnnotations;
 
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +34,7 @@ import java.util.Set;
  *
  * @author Federico Tomassetti
  */
-public interface ResolvedTypeDeclaration extends ResolvedDeclaration {
+public interface ResolvedTypeDeclaration extends ResolvedDeclaration, HasAnnotations {
 
     ///
     /// Containment

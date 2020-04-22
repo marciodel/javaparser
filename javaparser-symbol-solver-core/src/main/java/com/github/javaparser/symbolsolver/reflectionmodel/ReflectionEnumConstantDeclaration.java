@@ -21,6 +21,7 @@
 
 package com.github.javaparser.symbolsolver.reflectionmodel;
 
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedEnumConstantDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -28,11 +29,13 @@ import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class ReflectionEnumConstantDeclaration implements ResolvedEnumConstantDeclaration {
 
     private Field enumConstant;
     private TypeSolver typeSolver;
+    private ReflectionAnnotatedElementAdapter reflectionAnnotatedElementAdapter;
 
     public ReflectionEnumConstantDeclaration(Field enumConstant, TypeSolver typeSolver) {
         if (!enumConstant.isEnumConstant()) {
@@ -40,6 +43,7 @@ public class ReflectionEnumConstantDeclaration implements ResolvedEnumConstantDe
         }
         this.enumConstant = enumConstant;
         this.typeSolver = typeSolver;
+        this.reflectionAnnotatedElementAdapter = new ReflectionAnnotatedElementAdapter(enumConstant, typeSolver);
     }
 
     @Override
@@ -52,5 +56,10 @@ public class ReflectionEnumConstantDeclaration implements ResolvedEnumConstantDe
         Class<?> enumClass = enumConstant.getDeclaringClass();
         ResolvedReferenceTypeDeclaration typeDeclaration = new ReflectionEnumDeclaration(enumClass, typeSolver);
         return new ReferenceTypeImpl(typeDeclaration, typeSolver);
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return reflectionAnnotatedElementAdapter.getAnnotations();
     }
 }

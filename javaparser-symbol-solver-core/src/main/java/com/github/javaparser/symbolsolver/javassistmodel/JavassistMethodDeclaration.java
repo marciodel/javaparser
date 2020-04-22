@@ -35,15 +35,20 @@ import com.github.javaparser.symbolsolver.core.resolution.TypeVariableResolution
 import com.github.javaparser.symbolsolver.declarations.common.MethodDeclarationCommonLogic;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
+
 import javassist.CtMethod;
 import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.MethodInfo;
+import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.SignatureAttribute;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Federico Tomassetti
@@ -151,12 +156,19 @@ public class JavassistMethodDeclaration implements ResolvedMethodDeclaration, Ty
             if ((ctMethod.getModifiers() & javassist.Modifier.VARARGS) > 0) {
                 variadic = i == (ctMethod.getParameterTypes().length - 1);
             }
+
+            MethodInfo mi = ctMethod.getMethodInfo2();
+            ParameterAnnotationsAttribute ainfo = (ParameterAnnotationsAttribute)
+                        mi.getAttribute(ParameterAnnotationsAttribute.invisibleTag);  
+            ParameterAnnotationsAttribute ainfo2 = (ParameterAnnotationsAttribute)
+                        mi.getAttribute(ParameterAnnotationsAttribute.visibleTag);  
+    
             Optional<String> paramName = JavassistUtils.extractParameterName(ctMethod, i);
             String signature = ctMethod.getGenericSignature() == null ? ctMethod.getSignature() : ctMethod.getGenericSignature();
             SignatureAttribute.MethodSignature methodSignature = SignatureAttribute.toMethodSignature(signature);
             SignatureAttribute.Type signatureType = methodSignature.getParameterTypes()[i];
             return new JavassistParameterDeclaration(JavassistUtils.signatureTypeToType(signatureType,
-                    typeSolver, this), typeSolver, variadic, paramName.orElse(null));
+                    typeSolver, this), typeSolver, variadic, paramName.orElse(null), ainfo.getAnnotations()[i], ainfo2.getAnnotations()[i]);
 
         } catch (NotFoundException | BadBytecode e) {
             throw new RuntimeException(e);
@@ -264,4 +276,17 @@ public class JavassistMethodDeclaration implements ResolvedMethodDeclaration, Ty
 
         return classRefPath;
     }
+    
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations() {
+        MethodInfo mi = ctMethod.getMethodInfo2();
+        AnnotationsAttribute ainfo = (AnnotationsAttribute)
+                    mi.getAttribute(AnnotationsAttribute.invisibleTag);  
+        AnnotationsAttribute ainfo2 = (AnnotationsAttribute)
+                    mi.getAttribute(AnnotationsAttribute.visibleTag);  
+
+        return Stream.concat(Arrays.stream(ainfo.getAnnotations()), Arrays.stream(ainfo2.getAnnotations()))
+                    .map(ann -> new JavassistAnnotationExpression(ann, typeSolver))
+                    .collect(Collectors.toList());
+      }
 }

@@ -24,6 +24,7 @@ package com.github.javaparser.symbolsolver.reflectionmodel;
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.resolution.MethodUsage;
+import com.github.javaparser.resolution.annotations.ResolvedAnnotationExpression;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -48,6 +49,7 @@ public class ReflectionMethodDeclaration implements ResolvedMethodDeclaration, T
 
     private Method method;
     private TypeSolver typeSolver;
+    private ReflectionAnnotatedElementAdapter reflectionAnnotatedElementAdapter;
 
     public ReflectionMethodDeclaration(Method method, TypeSolver typeSolver) {
         this.method = method;
@@ -55,6 +57,7 @@ public class ReflectionMethodDeclaration implements ResolvedMethodDeclaration, T
             throw new IllegalArgumentException();
         }
         this.typeSolver = typeSolver;
+        this.reflectionAnnotatedElementAdapter = new ReflectionAnnotatedElementAdapter(method, typeSolver);
     }
 
     @Override
@@ -112,8 +115,9 @@ public class ReflectionMethodDeclaration implements ResolvedMethodDeclaration, T
         if (method.isVarArgs()) {
             variadic = i == (method.getParameterCount() - 1);
         }
+
         return new ReflectionParameterDeclaration(method.getParameterTypes()[i], method.getGenericParameterTypes()[i],
-                typeSolver, variadic, method.getParameters()[i].getName());
+                typeSolver, variadic, method.getParameters()[i]);
     }
 
     @Override
@@ -161,5 +165,10 @@ public class ReflectionMethodDeclaration implements ResolvedMethodDeclaration, T
     @Override
     public Optional<MethodDeclaration> toAst() {
         return Optional.empty();
+    }
+
+    @Override
+    public List<ResolvedAnnotationExpression> getAnnotations(){
+        return reflectionAnnotatedElementAdapter.getAnnotations();
     }
 }
